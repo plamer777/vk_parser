@@ -1,0 +1,5 @@
+venv
+*.idea
+*__pycache__
+.env
+vk-parser-389000-6e8049153354.json

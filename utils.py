@@ -1,4 +1,5 @@
 """This file contains utility functions"""
+import re
 from classes.group_classes import Group
 # ------------------------------------------------------------------------
 
@@ -42,5 +43,15 @@ def create_group_info(
     for num, item in enumerate(groups, 1):
         result += template.format(
             num, *[getattr(item, field, None) for field in fields])
+
+    return result
+
+
+def clean_digits(data: str) -> str:
+    try:
+        pattern = re.compile(r'[^-0-9]*')
+        result = pattern.sub('', data)
+    except (ValueError, TypeError):
+        result = data
 
     return result

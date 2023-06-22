@@ -2,7 +2,7 @@
 from typing import Iterable
 from constants import (
     GPT_REQUEST_TEMPLATE, UPLOAD_FIELDS, GROUP_DATA_TEMPLATE, VK_GROUP_FIELDS,
-    MAX_GPT_ATTEMPTS, SYSTEM_ROLE, DATA_COLUMNS_TEMPLATE)
+    MAX_GPT_ATTEMPTS, SYSTEM_ROLE, DATA_COLUMNS_TEMPLATE, FIELDS_TO_TEMPLATES)
 from classes.group_classes import Group
 from utils import create_group_info
 from services.vk_group_service import VKGroupService
@@ -65,6 +65,50 @@ class VkGroupParseController:
                       f'attempt')
         return groups
 
+    async def add_solvency_progression_education_to_group(
+            self, groups: list[Group],
+            gpt_chat_request_templates: dict[str, str] = FIELDS_TO_TEMPLATES,
+            group_info_template: str = GROUP_DATA_TEMPLATE,
+            group_fields: list[str] = VK_GROUP_FIELDS,
+            additional_role: dict[str, str] = SYSTEM_ROLE
+    ) -> list[Group]:
+        """This method serves to generate different values for user's
+        solvency, progression and self-education
+        :param groups: a list of Group instances containing VK group data
+        :param gpt_chat_request_templates: a list of string representing the
+        templates for GPT chat requests
+        :param group_info_template: A template to create a string
+        representing multiple groups data
+        :param additional_role: a dictionary with additional role of GPT such
+        as system or assistant to change GPT chat behavior
+        :param group_fields: a list of strings representing fields that
+        should be added to group_info_template
+        :return: a list of dictionaries containing VK group data with added
+        tags
+        """
+
+        for group in groups:
+            for model_field, template in gpt_chat_request_templates.items():
+                for _ in range(MAX_GPT_ATTEMPTS):
+                    try:
+                        request = template.format(
+                            create_group_info(
+                                [group], group_info_template, group_fields))
+
+                        result = await self._gpt_service.fill_field_by_request(
+                            group, request, model_field,
+                            additional_role)
+                        if not result:
+                            continue
+
+                        break
+
+                    except Exception as e:
+                        print(f'The was an error while generating a field '
+                              f'data: {e}. One more attempt')
+
+        return groups
+
     def get_vk_ids(
             self, offset: int = 0, limit: int = None, start_num: int = 1
     ) -> list[Group]:
@@ -88,13 +132,16 @@ class VkGroupParseController:
         return models
 
     def get_groups_by_ids(
-            self, groups: list[Group]) -> list[Group] | None:
+            self, groups: list[Group], get_post_text: bool = True
+    ) -> list[Group] | None:
         """This method serves to get VK groups from official VK API by 
         provided groups filled with ids
+        :param get_post_text: a boolean indicating if you need to turn VK
+        post ids into its text
         :param groups: a list of strings representing VK group ids
         :return: a list of dictionaries representing VK group data
         """
-        result = self._vk_service.get_groups_by_ids(groups)
+        result = self._vk_service.get_groups_by_ids(groups, get_post_text)
         return result
 
     def send_groups_to_google_table(

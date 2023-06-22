@@ -1,12 +1,13 @@
 # The GPT VK Parser
 The application uploads VK group URLs from Google table, extracts ids, parse VK groups data by using 
-official API, creates tags depending on title, description, fixed post and status by using GPT chat and
-returns result to the Google sheet.
+official API, creates tags and make predictions about user solvency, self-education and progression 
+depending on title, description, fixed post and status by using GPT chat and returns result to the Google sheet.
 
 The app provides functionality as follows:
- - To download urls from Google sheet 
+ - To download urls from Google sheet
  - To get group data from VK API
  - To generate 3 tags by using GPT chat
+ - To make predictions about user solvency, self-education and progression
  - To send prepared group data to Google sheet
  - To set different parameters such as group batch to parse per request and to send to Google sheet,
 batch of groups to send to GPT chat to generate tags and so on
@@ -58,6 +59,8 @@ To start the app just follow the next steps:
  - Prepare settings in the constants.py file following the steps provided below
  - Create and activate virtual environment
  - Set up all requirements provided in the requirements.txt file
+ - Change main.py file by your needs if you want to generate tags or make predictions or both (new method was added
+in the VkGroupParseController in 22 June 2023)
  - Run the application by using the command: `python3 main.py`
 
 ---
@@ -94,6 +97,15 @@ because of GPT chat can provide different kinds of data per same request)
 - GPT_REQUEST_TEMPLATE - a main template request to GPT chat (change it according to your needs)
 - GROUP_DATA_TEMPLATE - a VK group data template to inject into GPT chat template
 - VK_GROUP_FIELDS - a VK group fields to get from VK API. Read official documentation to see all available fields
+
+New settings added in 22 July 2023:
+- GET_POST_TEXT - The boolean parameter indicates whether to include post text from post id or not
+- GPT_SOLVENCY_TEMPLATE - very similar to GPT_REQUEST_TEMPLATE but for making predictions about group users' solvency
+- GPT_PROGRESSION_TEMPLATE - the same as above but for progression
+- GPT_SELF_EDUCATION_TEMPLATE - the same as above but for self-education
+- FIELDS_TO_TEMPLATES - a dictionary with Group model fields that have to be sent to Google sheet and templates for 
+each field to generate data by GPT chat
+
 
 Example of .env file:
 

@@ -13,6 +13,9 @@ class Group(BaseModel):
     fixed_post: str = ''
     status: str = ''
     tags: str = ''
+    user_solvency: int | None = None
+    user_progression: int | None = None
+    user_self_education: int | None = None
 
     class Config:
-        orm_mode = True
+        validate_assignment = True

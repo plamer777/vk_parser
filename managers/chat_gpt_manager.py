@@ -23,7 +23,8 @@ class ChatGPTManager:
         if api_url:
             openai.api_base = api_url
 
-    async def get_completion(self, messages: list[dict]) -> str | None:
+    async def get_completion(
+            self, messages: list[dict]) -> str | None:
         """This method serves to prepare provided request by GPT chat model
         and to return requested data
         :param messages: a list of dictionaries with GPT roles and content
@@ -33,7 +34,7 @@ class ChatGPTManager:
         try:
             completion = await openai.ChatCompletion.acreate(
                 model=self._model,
-                messages=messages
+                messages=messages,
             )
             return completion.choices[0].message.content
 

@@ -1,4 +1,5 @@
 """This file contains VKAPIManager to get data from VK API"""
+import sys
 from time import sleep
 from vk_api import VkApi
 from constants import (
@@ -49,8 +50,7 @@ class VKGroupManager:
             return result
 
         except Exception as e:
-            print(f'Failed to get groups data from VK API, error: {e}')
-            return []
+            sys.exit(f'Failed to get groups data from VK API, error: {e}')
 
     def get_post_text_by_group_id(
             self, group_id: str | int, count: int = 1, delay: float = 0.5

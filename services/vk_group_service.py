@@ -15,16 +15,19 @@ class VKGroupService:
         self._vk_manager = vk_manager
 
     def get_groups_by_ids(
-            self, groups: list[Group]) -> list[Group]:
+            self, groups: list[Group], get_post_text: bool = True) -> list[Group]:
         """This method serves to get VK groups from official VK API by
         the provided ids
         :param groups: a list of Group instances with their ids
+        :param get_post_text: a boolean indicating if you need to turn VK
+        post ids into its text
         :return: a list of models representing VK groups
         """
         try:
             ids = [group.id for group in groups]
             result = self._vk_manager.get_groups_by_ids(ids)
-            result = self._change_fixed_post_ids_to_text(result)
+            if get_post_text:
+                result = self._change_fixed_post_ids_to_text(result)
 
             for group in groups:
                 if result and group.id == str(result[0].get('id')):
